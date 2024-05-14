@@ -1,12 +1,21 @@
-import kv from './kv_limiter.ts';
+import { should_pass, should_fail } from "./lib/test.ts";
 
-await kv.set(['test_key1'], 'value');
+await should_pass(
+    "max_set pass",
+    {
+        max_set: 100,
+    },
+    (kv) => {
+        return kv.set(["test_key"], "a".repeat(99));
+    },
+);
 
-const value = (await kv.get(['test_key1'])).value;
-
-if (value !== 'value') {
-    console.error('expected value to be "value" but got',value);
-}
-else {
-    console.log('test passed');
-}
+await should_fail(
+    "max_set fail",
+    {
+        max_set: 100,
+    },
+    (kv) => {
+        return kv.set(["test_key"], "a".repeat(101));
+    },
+);

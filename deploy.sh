@@ -1,3 +1,3 @@
 #!/bin/bash
 
-deployctl deploy --project deploy-limiter --prod server.ts
+deployctl deploy --project kv-limiter --prod server.ts
