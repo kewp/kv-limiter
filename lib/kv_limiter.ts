@@ -42,7 +42,7 @@ export default function (limits) {
                         saved_bytes + JSON.stringify(obj).length;
                     if (total_bytes > bytes) {
                         if (limits.on_exceed) {
-                            await limits.on_exceed();
+                            await limits.on_exceed('set');
                         }
                         return;
                     }
@@ -76,7 +76,7 @@ export default function (limits) {
                     saved_bytes + JSON.stringify(_.value).length;
                 if (total_bytes > bytes) {
                     if (limits.on_exceed) {
-                        await limits.on_exceed();
+                        await limits.on_exceed('get');
                     }
                     return _;
                 }
