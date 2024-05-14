@@ -5,7 +5,7 @@ export async function should(name, config, fn, pass) {
 
     const kv = limiter({
         ...config,
-        on_exceed: () => {
+        on_exceed: async () => {
             passed = false;
         },
     });
