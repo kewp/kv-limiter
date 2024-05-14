@@ -78,9 +78,11 @@ export default function (limits) {
                     if (limits.on_exceed) {
                         await limits.on_exceed();
                     }
+                    return _;
                 }
 
                 await kv.set([GET_BYTES_KEY], total_bytes);
+                return _;
             } else return await kv.get(keys);
         },
 
