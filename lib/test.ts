@@ -14,10 +14,10 @@ export async function should(name, config, fn, pass) {
 
     if (passed !== pass) {
         console.error(
-            `[${name}] test not passed, expected to ${pass ? "pass" : "fail"} but did not`,
+            `[${name}] not ok, expected to ${pass ? "pass" : "fail"} but did not`,
         );
     } else {
-        console.log(`[${name}] test passed`);
+        console.log(`[${name}] ok`);
     }
 }
 
@@ -27,4 +27,9 @@ export async function should_pass(name, config, fn) {
 
 export async function should_fail(name, config, fn) {
     await should(name, config, fn, false);
+}
+
+export async function should_fail_then_pass(name, config, fn1, fn2) {
+    await should_fail(`${name} (fail)`, config, fn1);
+    await should_pass(`${name} (pass)`, config, fn2);
 }

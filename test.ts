@@ -1,21 +1,57 @@
-import { should_pass, should_fail } from "./lib/test.ts";
+import { should_pass, should_fail, should_fail_then_pass } from "./lib/test.ts";
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 await should_pass(
     "max_set pass",
     {
-        max_set: 100,
+        max_set: {
+            bytes: 100,
+            interval_ms: 100
+        }
     },
-    (kv) => {
-        return kv.set(["test_key"], "a".repeat(99));
+    async (kv) => {
+        await kv.reset_limits()
+        await kv.set(["test_key"], "a".repeat(98));
+        await delay(200);
+        await kv.set(["test_key"], "a".repeat(98));
     },
 );
 
 await should_fail(
     "max_set fail",
     {
-        max_set: 100,
+        max_set: {
+            bytes: 100,
+            interval_ms: 100
+        }
     },
-    (kv) => {
-        return kv.set(["test_key"], "a".repeat(101));
+    async (kv) => {
+        await kv.reset_limits()
+        await kv.set(["test_key"], "a".repeat(98));
+        await delay(50);
+        await kv.set(["test_key"], "a".repeat(98));
     },
+);
+
+await should_fail_then_pass(
+    "max_set fail then pass",
+    {
+        max_set: {
+            bytes: 100,
+            interval_ms: 100
+        }
+    },
+    async (kv) => {
+        await kv.reset_limits()
+        await kv.set(["test_key"], "a".repeat(98));
+        await delay(50);
+        await kv.set(["test_key"], "a".repeat(98));
+    },
+    async (kv) => {
+        await delay(100);
+        await kv.set(["test_key"], "a".repeat(98));
+    }
 );
