@@ -110,3 +110,35 @@ when subsequent calls do fail you just get
 an empty list ... because of generators ...
 which i don't fully understand ... but the
 tests are working!
+
+## local count
+
+if we save the bytes and the ms in a local
+variable we can check if we've exceeded
+without going to kv to check the count
+variables - that's because even in a separate
+process the timing (i.e. `Date.now()`) should
+be appropriate. so we can see if we're still
+within the current interval window. if so,
+and the last saved count is above the limit,
+then we don't need to check in the kv db -
+we have previously failed ... hence these
+variables:
+
+```ts
+const local_count = {
+    set: {
+        bytes: 0,
+        ms: 0,
+    },
+    get: {
+        bytes: 0,
+        ms: 0,
+    },
+};
+```
+
+however, we have to make sure these are kept
+up to date correctly ... and i need to come
+up with some tests that make sure this is the
+case ...
