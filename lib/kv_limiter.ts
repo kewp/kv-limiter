@@ -92,32 +92,28 @@ export default function (limits) {
                 const { bytes, interval_ms } = limits.max_get;
 
                 const generator = async function* (opts) {
+
+                    const saved_bytes = await get_bytes(
+                        GET_BYTES_KEY,
+                        GET_MS_KEY,
+                        interval_ms,
+                    );
+
+                    if (saved_bytes > bytes) return;
+
                     const iterator = kv.list(opts);
+                    let total_bytes = saved_bytes;
                     for await (const _ of iterator) {
-                        const saved_bytes = await get_bytes(
-                            GET_BYTES_KEY,
-                            GET_MS_KEY,
-                            interval_ms,
-                        );
 
-                        // the on_exceed got run last time ...
-                        if (saved_bytes > bytes) return;
-
-                        // failure is triggered after a get
-                        // but subsequent gets will pass through / not happen
-                        // until the timer resets
-                        const total_bytes =
-                            saved_bytes + JSON.stringify(_.value).length;
-
-                        await kv.set([GET_BYTES_KEY], total_bytes);
-
-                        if (total_bytes > bytes) {
-                            if (limits.on_exceed) {
-                                await limits.on_exceed("get");
-                            }
-                        }
-
+                        total_bytes += JSON.stringify(_.value).length;
                         yield _;
+                    }
+                    await kv.set([GET_BYTES_KEY], total_bytes);
+
+                    if (total_bytes > bytes) {
+                        if (limits.on_exceed) {
+                            await limits.on_exceed("get");
+                        }
                     }
                 };
 

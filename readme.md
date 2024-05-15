@@ -95,3 +95,18 @@ currently. but of course, we'd have to change
 existing code to handle this. might be better to
 return a proper kv result but with `null` in the
 value field...
+
+## list
+
+i'm not sure but i think `kv.list` pulls in
+everything at once ... so we can't go through
+each item and check if we've reached a limit,
+we have to go through everything and check at
+the end if the total was exceeded ... so only
+subsequent get/list calls will fail ...
+
+one thing about list that's nice, though, is
+when subsequent calls do fail you just get
+an empty list ... because of generators ...
+which i don't fully understand ... but the
+tests are working!
