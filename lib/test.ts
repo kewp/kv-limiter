@@ -1,5 +1,9 @@
 import limiter from "./kv_limiter.ts";
 
+export function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function should(name, config, fn, pass) {
     let passed = true;
 
