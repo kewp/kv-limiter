@@ -142,3 +142,16 @@ however, we have to make sure these are kept
 up to date correctly ... and i need to come
 up with some tests that make sure this is the
 case ...
+
+## other considerations
+
+how sure are we that ... `Date.now()` is going to
+give ... the same, synchronised value across isolates?
+like, if one isolate is running in Asia and another
+is in Europe ... surely that means that one could be
+giving a totally different millisecond value?
+
+i see the docs say it's based on utc ...
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/now
+so shouldn't be time zone dependent i.e. should have
+the same value regardless of where the isolate it.
