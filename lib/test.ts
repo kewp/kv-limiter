@@ -45,3 +45,15 @@ export async function should_return_null(name, config, fn) {
         console.log(`[${name}] ok`);
     }
 }
+
+export async function should_equal(name, config, fn, expected) {
+    const kv = limiter(config);
+    const result = await fn(kv);
+    if (result !== expected) {
+        console.error(
+            `[${name}] not ok, expected ${expected} but got ${result}`,
+        );
+    } else {
+        console.log(`[${name}] ok`);
+    }
+}

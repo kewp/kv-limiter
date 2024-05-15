@@ -87,6 +87,44 @@ export default function (limits) {
             } else return await kv.get(keys);
         },
 
+        list: (opts) => {
+            if (limits.max_get) {
+                const { bytes, interval_ms } = limits.max_get;
+
+                const generator = async function* (opts) {
+                    const iterator = kv.list(opts);
+                    for await (const _ of iterator) {
+                        const saved_bytes = await get_bytes(
+                            GET_BYTES_KEY,
+                            GET_MS_KEY,
+                            interval_ms,
+                        );
+
+                        // the on_exceed got run last time ...
+                        if (saved_bytes > bytes) return;
+
+                        // failure is triggered after a get
+                        // but subsequent gets will pass through / not happen
+                        // until the timer resets
+                        const total_bytes =
+                            saved_bytes + JSON.stringify(_.value).length;
+
+                        await kv.set([GET_BYTES_KEY], total_bytes);
+
+                        if (total_bytes > bytes) {
+                            if (limits.on_exceed) {
+                                await limits.on_exceed("get");
+                            }
+                        }
+
+                        yield _;
+                    }
+                };
+
+                return generator(opts);
+            } else return kv.list(keys);
+        },
+
         reset_limits: async () => {
             await kv.set([SET_BYTES_KEY], 0);
             await kv.set([SET_MS_KEY], Date.now());
