@@ -19,15 +19,15 @@ await should_equal(
         },
         max_get: {
             bytes: 100,
-            interval_ms: 100
-        }
+            interval_ms: 100,
+        },
     },
     async (kv) => {
         await kv.reset_limits();
         await kv.set(["test_key"], "test_value");
         return (await kv.get(["test_key"])).value;
     },
-    "test_value"
+    "test_value",
 );
 
 await should_pass(
@@ -165,12 +165,12 @@ await should_pass(
     async (kv) => {
         await kv.reset_limits();
         await kv.set(["test_key", "one"], "a".repeat(98));
-        await kv.set(['test_key', 'two'], "a".repeat(98));
+        await kv.set(["test_key", "two"], "a".repeat(98));
 
         const iter = kv.list<string>({ prefix: ["test_key"] });
         const users = [];
         for await (const res of iter) users.push(res);
-    }
+    },
 );
 
 await should_equal(
@@ -184,13 +184,13 @@ await should_equal(
     async (kv) => {
         await kv.reset_limits();
         await kv.set(["test_key", "one"], "a".repeat(98));
-        await kv.set(['test_key', 'two'], "b".repeat(98));
-        let str = '';
+        await kv.set(["test_key", "two"], "b".repeat(98));
+        let str = "";
         const iter = kv.list<string>({ prefix: ["test_key"] });
         for await (const res of iter) str += res.value;
         return str;
     },
-    "a".repeat(98) + "b".repeat(98)
+    "a".repeat(98) + "b".repeat(98),
 );
 
 await should_fail(
@@ -204,10 +204,37 @@ await should_fail(
     async (kv) => {
         await kv.reset_limits();
         await kv.set(["test_key", "one"], "a".repeat(98));
-        await kv.set(['test_key', 'two'], "a".repeat(98));
+        await kv.set(["test_key", "two"], "a".repeat(98));
 
         const iter = kv.list<string>({ prefix: ["test_key"] });
         const users = [];
         for await (const res of iter) users.push(res);
-    }
-)
+    },
+);
+
+await should_equal(
+    "list should return empty on failure",
+    {
+        max_get: {
+            bytes: 100,
+            interval_ms: 100,
+        },
+    },
+    async (kv) => {
+        await kv.set(["test_key", "one"], "a".repeat(98));
+        await kv.set(["test_key", "two"], "a".repeat(98));
+
+        await kv.reset_limits();
+
+        await kv.get(["test_key", "one"]);
+        await kv.get(["test_key", "two"]);
+
+        // this should come back with nothing ...
+
+        const iter = kv.list<string>({ prefix: ["test_key"] });
+        const users = [];
+        for await (const res of iter) users.push(res);
+        return users.length;
+    },
+    0,
+);
