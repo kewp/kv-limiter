@@ -92,7 +92,6 @@ export default function (limits) {
                 const { bytes, interval_ms } = limits.max_get;
 
                 const generator = async function* (opts) {
-
                     const saved_bytes = await get_bytes(
                         GET_BYTES_KEY,
                         GET_MS_KEY,
@@ -104,7 +103,6 @@ export default function (limits) {
                     const iterator = kv.list(opts);
                     let total_bytes = saved_bytes;
                     for await (const _ of iterator) {
-
                         total_bytes += JSON.stringify(_.value).length;
                         yield _;
                     }
@@ -112,7 +110,7 @@ export default function (limits) {
 
                     if (total_bytes > bytes) {
                         if (limits.on_exceed) {
-                            await limits.on_exceed("get");
+                            await limits.on_exceed("list");
                         }
                     }
                 };
