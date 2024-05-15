@@ -42,7 +42,7 @@ export default function (limits) {
                         saved_bytes + JSON.stringify(obj).length;
                     if (total_bytes > bytes) {
                         if (limits.on_exceed) {
-                            await limits.on_exceed('set');
+                            await limits.on_exceed("set");
                         }
                         return;
                     }
@@ -74,14 +74,15 @@ export default function (limits) {
                 // until the timer resets
                 const total_bytes =
                     saved_bytes + JSON.stringify(_.value).length;
-                if (total_bytes > bytes) {
-                    if (limits.on_exceed) {
-                        await limits.on_exceed('get');
-                    }
-                    return _;
-                }
 
                 await kv.set([GET_BYTES_KEY], total_bytes);
+
+                if (total_bytes > bytes) {
+                    if (limits.on_exceed) {
+                        await limits.on_exceed("get");
+                    }
+                }
+
                 return _;
             } else return await kv.get(keys);
         },
@@ -89,6 +90,8 @@ export default function (limits) {
         reset_limits: async () => {
             await kv.set([SET_BYTES_KEY], 0);
             await kv.set([SET_MS_KEY], Date.now());
+            await kv.set([GET_BYTES_KEY], 0);
+            await kv.set([GET_MS_KEY], Date.now());
         },
     };
 }

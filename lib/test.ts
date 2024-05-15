@@ -33,3 +33,15 @@ export async function should_fail_then_pass(name, config, fn1, fn2) {
     await should_fail(`${name} (fail)`, config, fn1);
     await should_pass(`${name} (pass)`, config, fn2);
 }
+
+export async function should_return_null(name, config, fn) {
+    const kv = limiter(config);
+    const result = await fn(kv);
+    if (result) {
+        console.error(
+            `[${name}] not ok, expected to return null but did not`,
+        );
+    } else {
+        console.log(`[${name}] ok`);
+    }
+}

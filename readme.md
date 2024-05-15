@@ -81,5 +81,17 @@ what is about to be set.
 with get you can't know if you've overtaken the
 limit until you've gotten the value! so we get
 the value, _then_ check if it and the last total
-exceeds ...
+exceeds ... if so, set the total value, and fail.
+subsequent gets will then fail / pass through
+(and not add to your kv usage) until you go past
+the ms ...
 
+## return value
+
+not sure what to return when the wrapper passes
+through i.e. you've exceeded your limit ... should
+we just return `null`? that's what's happening
+currently. but of course, we'd have to change
+existing code to handle this. might be better to
+return a proper kv result but with `null` in the
+value field...
