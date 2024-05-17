@@ -155,3 +155,11 @@ i see the docs say it's based on utc ...
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/now
 so shouldn't be time zone dependent i.e. should have
 the same value regardless of where the isolate it.
+
+## research
+
+i just saw this on hacker news:
+https://smudge.ai/blog/ratelimit-algorithms
+
+a great article on rate limiters. goes through the different types.
+what i've implemented here is the fixed window limiter.
